@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AMI Curious</title>
+    <style>
+        /* Reset and base styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* A4 Paper Container */
+        .paper {
+            width: 210mm;
+            height: 297mm;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+            border: 1px solid #ccc;
+            touch-action: pan-y; /* Prevent vertical scroll interference */
+            margin-bottom: 20px;
+        }
+
+        /* Filling Image */
+        .fill-img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 1;
+            /* No transition for instant change */
+        }
+
+        /* Instruction Text */
+        .instruction {
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+            max-width: 210mm;
+        }
+
+        /* Print styles for actual A4 output */
+        @media print {
+            body {
+                background-color: white;
+                padding: 0;
+                flex-direction: row;
+            }
+
+            .paper {
+                width: 100%;
+                height: 100%;
+                box-shadow: none;
+                border: none;
+                margin: 0;
+                margin-bottom: 0;
+            }
+
+            .instruction {
+                display: none;
+            }
+
+            .fill-img {
+                object-fit: cover;
+            }
+        
+            @page {
+                size: A4;
+                margin: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="paper" id="paper">
+        <img src="page1.png" alt="Background Image Filling the Paper" class="fill-img" id="fillImg">
+    </div>
+    <div class="instruction">swipe right left to change another page</div>
+    
+    <script>
+        // Array of placeholder images (now single for constancy)
+        const images = [
+            'page4.png',
+            'page3.png',
+            'page2.png',
+            'page1.png'
+        ];
+        let currentIndex = 0;
+        const imgElement = document.getElementById('fillImg');
+        const paper = document.getElementById('paper');
+
+        // Function for instant image change
+        function changeImage(newIndex) {
+            imgElement.src = images[newIndex];
+        }
+
+        // Swipe detection variables
+        let startX = 0;
+        let currentX = 0;
+        const swipeThreshold = 70; // Minimum pixels to detect swipe
+
+        // Touch event handlers
+        paper.addEventListener('touchstart', (e) => {
+            startX = e.touches[0].clientX;
+        });
+
+        paper.addEventListener('touchmove', (e) => {
+            currentX = e.touches[0].clientX;
+        });
+
+        paper.addEventListener('touchend', (e) => {
+            const deltaX = currentX - startX;
+            if (Math.abs(deltaX) > swipeThreshold) {
+                if (deltaX > 0) {
+                    // Swipe right: next image
+                    currentIndex = (currentIndex + 1) % images.length;
+                } else {
+                    // Swipe left: previous image
+                    currentIndex = (currentIndex - 1 + images.length) % images.length;
+                }
+                changeImage(currentIndex);
+            }
+        });
+    </script>
+</body>
+</html>
